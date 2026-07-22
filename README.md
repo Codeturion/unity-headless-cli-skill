@@ -70,11 +70,15 @@ An agent with a terminal needs none of the MCP protocol. `unity command` / `unit
 
 ## How this relates to Unity's official skills
 
-Unity publishes its own skill collection at [Unity-Technologies/skills](https://github.com/Unity-Technologies/skills). It is excellent for what it covers: editor installs, project creation, builds and test runs, UPM package management, Unity Gaming Services, IAP, and ad mediation.
+Unity publishes its own skill collection at [Unity-Technologies/skills](https://github.com/Unity-Technologies/skills). It is excellent, and its `unity-cli` skill documents the same CLI this repo uses, including the connected-editor surface (`unity pipeline`, `unity command`, `unity status`, `unity list`) in its advanced reference. If you want the full command reference maintained by Unity, use their skill.
 
-What it deliberately does not cover is this workflow. The official `unity-cli` skill states in its own SKILL.md that it does not handle the `com.unity.pipeline` package or a persistent headless editor with live commands. That gap is exactly what this repo fills: a long-lived `-batchmode` editor that you send scene edits, component changes, and C# eval to at interactive speed, with no rebuild or relaunch per command.
+This repo is not a competing reference. It is the workflow layer on top:
 
-Use both. The official skills get an editor installed and a project building; this one turns that editor into something an agent can drive live.
+- **One-shot project bootstrap.** An idempotent skill that installs the CLI, adds `com.unity.pipeline`, drops the reference doc into your project, and wires `CLAUDE.md` so every future agent session picks the workflow up automatically. The official skills document commands; they do not set your project up to be agent-driven.
+- **Persistent headless editor as the default mode.** The official docs describe talking to a running Editor. This repo is built around keeping a `-batchmode` editor alive on a remote machine with no GUI at all, driven over SSH, which is the setup that matters for build servers and working away from your desk.
+- **The extras:** a compile-ready custom `[CliCommand]` example, a standalone installer script that needs no Claude, and a weekly docs-drift audit so the bundled reference does not silently rot.
+
+Use both. Their skills for installs, builds, packages, and the authoritative command reference; this one to turn a project into something an agent drives headless.
 
 ## Security model
 
