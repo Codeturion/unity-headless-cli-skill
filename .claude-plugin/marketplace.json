@@ -1,0 +1,20 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "unity-headless-cli-skill",
+  "description": "Marketplace for the Unity headless CLI plugin: a skill that sets up a project to drive a Unity Editor from the terminal with no GUI and no MCP server.",
+  "owner": {
+    "name": "Codeturion"
+  },
+  "plugins": [
+    {
+      "name": "unity-headless-cli",
+      "description": "Set up a Unity project to be driven headless from the terminal: adds com.unity.pipeline, writes docs/unity-cli-ref.md, and wires CLAUDE.md to point at it. Then Claude can create GameObjects, edit assets, run tests, and evaluate live C# over SSH, no GUI editor and no MCP server.",
+      "author": {
+        "name": "Codeturion"
+      },
+      "category": "development",
+      "source": "./",
+      "homepage": "https://github.com/Codeturion/unity-headless-cli-skill"
+    }
+  ]
+}

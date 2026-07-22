@@ -1,0 +1,19 @@
+{
+  "name": "unity-headless-cli",
+  "description": "Set up a Unity project to be driven headless from the terminal (no GUI, no MCP server) and teach Claude the workflow. Adds com.unity.pipeline, writes docs/unity-cli-ref.md, and points CLAUDE.md at it.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Codeturion"
+  },
+  "homepage": "https://github.com/Codeturion/unity-headless-cli-skill",
+  "license": "MIT",
+  "keywords": [
+    "unity",
+    "headless",
+    "cli",
+    "gamedev",
+    "ci",
+    "batchmode",
+    "automation"
+  ]
+}
