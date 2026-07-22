@@ -1,6 +1,8 @@
 # unity-headless-cli-skill
 
+[![Version](https://img.shields.io/github/v/release/Codeturion/unity-headless-cli-skill?sort=semver)](https://github.com/Codeturion/unity-headless-cli-skill/releases)
 [![GitHub stars](https://img.shields.io/github/stars/Codeturion/unity-headless-cli-skill?style=flat)](https://github.com/Codeturion/unity-headless-cli-skill/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/Codeturion/unity-headless-cli-skill?style=flat)](https://github.com/Codeturion/unity-headless-cli-skill/network/members)
 [![Last commit](https://img.shields.io/github/last-commit/Codeturion/unity-headless-cli-skill)](https://github.com/Codeturion/unity-headless-cli-skill/commits)
 [![Issues](https://img.shields.io/github/issues/Codeturion/unity-headless-cli-skill)](https://github.com/Codeturion/unity-headless-cli-skill/issues)
 [![License: MIT](https://img.shields.io/github/license/Codeturion/unity-headless-cli-skill)](LICENSE)
