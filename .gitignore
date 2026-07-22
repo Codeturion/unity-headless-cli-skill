@@ -6,3 +6,8 @@ Thumbs.db
 # Local scratch
 /tmp/
 *.tmp
+
+# audit run artifacts (generated in CI)
+audit/current.snapshot.md
+audit/drift.diff
+audit/issue-body.md

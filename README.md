@@ -69,6 +69,21 @@ An agent with a terminal needs none of the MCP protocol. `unity command` / `unit
 - Stale Unity Hub keychain items can make every CLI command hang on an invisible GUI keychain prompt. Clear them if commands hang.
 - `eval` runs arbitrary C# and is gated behind the pipeline server's localhost bearer token by design.
 
+## Keeping the reference honest
+
+Unity's CLI docs change over time, so the bundled reference can drift. A weekly GitHub
+Action (`.github/workflows/docs-audit.yml`, Mondays 08:00 UTC) re-fetches the official
+reference and diffs it against a committed snapshot (`audit/unity-cli-reference.snapshot.md`).
+If anything changed, it opens a `docs-drift` issue with the diff.
+
+It only detects and notifies. It never edits the reference and never commits. When an
+issue shows up, check the diff, update `docs/unity-cli-ref.md` if commands or flags moved,
+then refresh the snapshot:
+
+```bash
+python3 audit/snapshot.py audit/unity-cli-reference.snapshot.md
+```
+
 ## Docs
 
 - Unity CLI reference: https://docs.unity.com/en-us/unity-cli/unity-cli-reference

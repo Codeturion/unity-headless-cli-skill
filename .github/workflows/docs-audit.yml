@@ -1,0 +1,73 @@
+name: docs drift audit
+
+# Detection only. This never edits docs/unity-cli-ref.md and never commits.
+# When the upstream Unity CLI reference changes, it opens (or comments on) a
+# GitHub issue with the diff so a human can review and update the reference.
+
+on:
+  schedule:
+    - cron: "0 8 * * 1" # every Monday 08:00 UTC
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Fetch + normalize current docs
+        run: python3 audit/snapshot.py audit/current.snapshot.md
+
+      - name: Diff against committed snapshot
+        id: diff
+        run: |
+          if diff -u audit/unity-cli-reference.snapshot.md audit/current.snapshot.md > audit/drift.diff; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      # Build the issue body in a file. The fetched diff is untrusted content, so
+      # it only ever flows through files here, never through shell interpolation
+      # or an unquoted heredoc (which would evaluate backticks / $() in the text).
+      - name: Compose issue body
+        if: steps.diff.outputs.changed == 'true'
+        env:
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          {
+            printf '%s\n\n' 'The upstream **Unity CLI reference** changed since the committed snapshot.'
+            printf 'Source: https://docs.unity.com/en-us/unity-cli/unity-cli-reference\n'
+            printf 'Run: %s\n\n' "$RUN_URL"
+            printf '%s\n\n' 'Review the diff. If real signatures moved (renamed flags, new or removed commands), update docs/unity-cli-ref.md and skills/unity-headless-cli/reference/unity-cli-ref.md, then refresh the baseline with: python3 audit/snapshot.py audit/unity-cli-reference.snapshot.md and commit. Nothing here edits the reference automatically.'
+            printf '```diff\n'
+            head -c 50000 audit/drift.diff
+            printf '\n```\n'
+          } > audit/issue-body.md
+
+      - name: Open or update drift issue
+        if: steps.diff.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          gh label create docs-drift --color FBCA04 \
+            --description "Upstream Unity CLI reference changed" 2>/dev/null || true
+          existing="$(gh issue list --state open --label docs-drift --json number --jq '.[0].number // empty')"
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --body "Drift still present as of this run. $RUN_URL"
+          else
+            gh issue create \
+              --title "Unity CLI reference drift detected" \
+              --label docs-drift \
+              --body-file audit/issue-body.md
+          fi
