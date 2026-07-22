@@ -13,6 +13,11 @@ A Claude Code plugin that sets up any Unity project to be driven **headless from
 
 The heavy lifting is the Unity CLI plus its experimental `com.unity.pipeline` package. `unity command` and `unity command eval` *are* the tools; an agent with a terminal needs none of the MCP protocol.
 
+<p align="center">
+  <img src="media/demo.gif" width="300" alt="Headless Unity driven from the terminal" />
+</p>
+<p align="center"><a href="media/demo.mp4">Full-resolution video</a></p>
+
 ## Install (Claude Code)
 
 ```text
@@ -63,11 +68,34 @@ Full command surface, custom commands, automation contract, and gotchas: [`skill
 
 An agent with a terminal needs none of the MCP protocol. `unity command` / `unity command eval` *are* the tools. Same capability as a stdio MCP bridge, but no GUI to keep open, no window to render, works headless over SSH, and drops straight into CI. The same terminal drives any project with `--project-path`.
 
+## How this relates to Unity's official skills
+
+Unity publishes its own skill collection at [Unity-Technologies/skills](https://github.com/Unity-Technologies/skills). It is excellent, and its `unity-cli` skill documents the same CLI this repo uses, including the connected-editor surface (`unity pipeline`, `unity command`, `unity status`, `unity list`) in its advanced reference. If you want the full command reference maintained by Unity, use their skill.
+
+This repo is not a competing reference. It is the workflow layer on top:
+
+- **One-shot project bootstrap.** An idempotent skill that installs the CLI, adds `com.unity.pipeline`, drops the reference doc into your project, and wires `CLAUDE.md` so every future agent session picks the workflow up automatically. The official skills document commands; they do not set your project up to be agent-driven.
+- **Persistent headless editor as the default mode.** The official docs describe talking to a running Editor. This repo is built around keeping a `-batchmode` editor alive on a remote machine with no GUI at all, driven over SSH, which is the setup that matters for build servers and working away from your desk.
+- **The extras:** a compile-ready custom `[CliCommand]` example, a standalone installer script that needs no Claude, and a weekly docs-drift audit so the bundled reference does not silently rot.
+
+Use both. Their skills for installs, builds, packages, and the authoritative command reference; this one to turn a project into something an agent drives headless.
+
+## Security model
+
+`eval` runs arbitrary C#, so it is worth being precise about what is exposed and by whom:
+
+- The HTTP server and its bearer-token-gated `eval` are part of Unity's own `com.unity.pipeline` package, not something added by this repo. This skill only installs the package and documents how to use it.
+- The pipeline server binds **localhost only**. Nothing listens on external interfaces; remote use goes through SSH to a shell on the machine, the same trust boundary as any other terminal access.
+- Every request requires the bearer token the pipeline generates for the project. A process that has the token already has a shell as your user, at which point it does not need `eval` to run code.
+- The skill itself never phones home, never fetches remote instructions at runtime, and asks before any machine-level install. The bundled reference doc is static and committed; the weekly docs audit only diffs upstream docs and opens an issue, it never edits or executes anything.
+
+Treat the running editor like any other local dev server: keep it on machines you trust, behind SSH you trust.
+
 ## Caveats
 
 - The CLI is beta and the package is experimental (`-exp`). Expect churn between versions.
 - Stale Unity Hub keychain items can make every CLI command hang on an invisible GUI keychain prompt. Clear them if commands hang.
-- `eval` runs arbitrary C# and is gated behind the pipeline server's localhost bearer token by design.
+- `eval` runs arbitrary C# and is gated behind the pipeline server's localhost bearer token by design. See [Security model](#security-model).
 
 ## Keeping the reference honest
 
