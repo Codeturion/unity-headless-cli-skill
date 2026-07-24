@@ -1,3 +1,7 @@
+> [!NOTE]
+> The newest version of this skill is maintained in the [Codeturion/skills](https://github.com/Codeturion/skills) monorepo, together with all other Codeturion Unity skills.
+> Install from there: `npx skills add Codeturion/skills --skill unity-headless-cli` · browse: https://skills.fuatcankoseoglu.com/#unity-headless-cli
+
 # unity-headless-cli-skill
 
 [![Version](https://img.shields.io/github/v/release/Codeturion/unity-headless-cli-skill?sort=semver)](https://github.com/Codeturion/unity-headless-cli-skill/releases)
